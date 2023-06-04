@@ -1,62 +1,7 @@
-
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdarg.h>
-
-int	ft_strlen(char *str)
-{
-	int	i;
-
-	i = 0;
-	while (str[i] != '\0')
-		i++;
-	return (i);
-}
-
-char	*ft_itoa(int num)
-{
-	char	*str;
-	char	*rtn;
-	int		i;
-
-	i = 0;
-	if (num < 0)
-	{
-		str = ft_itoa(num * -1);
-		rtn = malloc(sizeof(char) * (ft_strlen(str) + 2));
-		rtn[i++] = '-';
-		while (str[i - 1] != '\0')
-		{
-			rtn[i] = str[i - 1];
-			i++;
-		}
-		rtn[i] = '\0';
-		free(str);
-		str = NULL;
-	}
-	else if (num > 9)
-	{
-		str = ft_itoa(num / 10);
-		rtn = malloc(sizeof(char) * (ft_strlen(str) + 2));
-		while (str[i] != '\0')
-		{
-			rtn[i] = str[i];
-			i++;
-		}
-		rtn[i++] = (num % 10) + '0';
-		rtn[i] = '\0';
-		free(str);
-		str = NULL;
-	}
-	else
-	{
-		rtn = malloc(sizeof(char) * 2);
-		rtn[i++] = (num % 10) + '0';
-		rtn[i] = '\0';
-	}
-	return (rtn);
-}
 
 int	ft_print_hexa(unsigned int hexa)
 {
@@ -73,13 +18,12 @@ int	ft_print_hexa(unsigned int hexa)
 
 int	ft_print_int(int d)
 {
-	char *str;
-	int	size;
+	int		size;
+	char	*str;
+	char	c;
 	
 	size = 0;
-	if (d != -2147483648)
-		str = ft_itoa(d);
-	else
+	if (d == -2147483648)
 	{
 		str = "-2147483648";
 		while (size < 11)
@@ -87,15 +31,27 @@ int	ft_print_int(int d)
 			write(1, &str[size], 1);
 			size++;
 		}
-		return (size);
 	}
-	while (str[size] != '\0')
+	else if (d < 0)
 	{
-		write(1, &str[size], 1);
+		c = '-';
+		write(1, &c, 1);
+		size++;
+		size += ft_print_int(d * -1);
+	}
+	else if (d > 9)
+	{
+		size += ft_print_int(d / 10);
+		c = (d % 10) + '0';
+		write(1, &c, 1);
 		size++;
 	}
-	free(str);
-	str = NULL;
+	else
+	{
+		c = (d % 10) + '0';
+		write(1, &c, 1);
+		size++;
+	}
 	return (size);
 }
 
@@ -154,9 +110,9 @@ int ft_printf(const char *format, ...)
 int main(void)
 {
 	int	i;
-	i = ft_printf("Hexadecimal for %d is %x\n", 42, 42);
+	i = ft_printf("Hexadecimal for %d is %x\n", -2147447, 42);
 	printf("SIZE MY PRINTF = %d\n", i);
-	i = printf("Hexadecimal for %d is %x\n", 42, 42);
+	i = printf("Hexadecimal for %d is %x\n", -2147447, 42);
 	printf("SIZE ORIGINAL PRINTF = %d\n", i);
 	return (0);
 }
